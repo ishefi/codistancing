@@ -6,14 +6,14 @@ from io import BytesIO
 
 
 def reformat_string(contents: str, line_distance: bool=False) -> str:
-    """Formats string and adds social distancing spaces.
+    """Reormats string and adds social distancing spaces.
 
-    :param contents: String to
+    :param contents: String to reformat.
     :param line_distance: If True - adds 4 lines of space between every two
                           consecutive lines.
     :return: Formatted string.
 
-    >>> format_string('if x == y:\n    print("hello!")')
+    >>> reformat_string('if x == y:\n    print("hello!")')
     if     x    ==    y    :
         print    (    "hello!"    )
     """
@@ -74,6 +74,14 @@ def _get_indent(token, next_token):
 
 
 def reformat_file(dst: str, line_distance: bool, dry_run: bool) -> None:
+    """Reformats file by adding social-distancing spaces.
+    Changes are done in-place.
+
+    :param dst: Location of file to reformat.
+    :param line_distance: If True - adds 4 lines of space between every two
+                          consecutive lines.
+    :param dry_run: If True - does not write changes back.
+    """
     with open(dst, "rb") as f:
         output = _reformat(f, line_distance)
 
