@@ -22,7 +22,6 @@ def reformat_string(contents: str, line_distance: bool=False) -> str:
 def _reformat(contents, line_distance):
     all_tokens = list(tokenize.tokenize(contents.readline))
     output = ''
-    curr_indent = 0
     for i, token in enumerate(all_tokens):
         next_token = all_tokens[i + 1]
         if next_token.type == tokenize.ENDMARKER:
@@ -33,37 +32,39 @@ def _reformat(contents, line_distance):
         # no spaces before new line
         if _is_newline(next_token):
             continue
-        elif token.type == tokenize.INDENT:
+        elif _is_itendation(next_token):
             continue
-            # curr_indent = token.end[1]
+        elif (indent := _should_indent(token, next_token)):
+            output += indent
+            continue
+        elif _is_itendation(token):
+            continue
         elif _is_newline(token):
             if next_token.type == tokenize.ENDMARKER:
                 break
-            if token.string != '\n':
+            if token.string != '\n': # fake newline, happens sometimes
                 continue
             if line_distance:
                 output += token.string * 4
-            if next_token.type not in (tokenize.INDENT, tokenize.DEDENT):
-                output += ' ' * next_token.start[1]
-        # make sure indentation matches original
-        elif token.type == tokenize.DEDENT:
-            if not next_token.type in (tokenize.INDENT, tokenize.DEDENT):
-                # output += ' ' * token.end[1]
-                curr_indent = token.start[1]
-                output += ' ' * curr_indent
         # code distance!
         else:
             output += '    '
     return output
 
-# def _intetation(token, next_token):
-#     # # we will deal with this in the next token
-#     # if next_token.type in (tokenize.INDENT, tokenize.DEDENT):
-#     #     return ''
-
 
 def _is_newline(token: tokenize.TokenInfo) -> bool:
     return token.exact_type in (tokenize.NEWLINE, tokenize.NL)
+
+def _is_itendation(token):
+    return token.exact_type in (tokenize.INDENT, tokenize.DEDENT)
+
+def _should_indent(token, next_token):
+    if token.exact_type == tokenize.DEDENT:
+        return ' ' * token.end[1]
+    elif _is_newline(token):
+        return ' ' * next_token.start[1]
+    return ''
+
 
 
 def reformat_file(dst: str, line_distance: bool, dry_run: bool) -> None:
