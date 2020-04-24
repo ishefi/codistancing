@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import tokenize
 from argparse import ArgumentParser
 from io import BytesIO
@@ -32,6 +33,7 @@ def _reformat(contents, line_distance):
 
         output += token.string
 
+        # we will take care of padding next iteration
         if _is_newline(next_token):
             continue
         if _is_newline(token):
@@ -62,21 +64,21 @@ def _is_indent(token):
 
 def _get_indent(token, next_token):
     if _is_indent(next_token):
-        return ''
+        return ""
     if token.exact_type == tokenize.DEDENT:
-        return ' ' * token.end[1]
+        return " " * token.end[1]
     elif _is_newline(token):
-        return ' ' * next_token.start[1]
-    return ''
+        return " " * next_token.start[1]
+    return ""
 
 
 
 def reformat_file(dst: str, line_distance: bool, dry_run: bool) -> None:
-    with open(dst, 'rb') as f:
+    with open(dst, "rb") as f:
         output = _reformat(f, line_distance)
 
     if not dry_run:
-        with open(dst, 'w') as f:
+        with open(dst, "w") as f:
             f.write(output)
 
 
@@ -86,7 +88,7 @@ def main():
     parser.add_argument("-l", "--line", action="store_true",
                         help="Include distancing between lines")
     source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("FILES", nargs="*", default=[],
+    source.add_argument("FILE", nargs="*", default=[],
                         help="Files to reformat (in place)")
     source.add_argument("-c", "--code",
                         help="Format the code passed in as a string.")
@@ -96,15 +98,12 @@ def main():
 
     if args.code:
         output = reformat_string(args.string, line_distance=args.line)
-        print("Output:")
-        print("==============================")
-        print(output)
-        print("==============================")
+        print(output, file=sys.stderr)
     else:
-        for f in args.FILES:
-            print(f"Formatting {f}...")
+        for f in args.FILE:
+            print(f"Formatting {f}...", file=sys.stderr)
             reformat_file(f, line_distance=args.line, dry_run=args.dry_run)
-        print("Done!")
+        print("Done!", file=sys.stderr)
 
 
 if __name__ == "__main__":
