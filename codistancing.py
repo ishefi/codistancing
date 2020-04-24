@@ -24,41 +24,45 @@ def _reformat(contents, line_distance):
     output = ''
     for i, token in enumerate(all_tokens):
         next_token = all_tokens[i + 1]
+        spaces = True
         if next_token.type == tokenize.ENDMARKER:
             break
-        if token.type == tokenize.ENCODING:
+        if not _should_add_token(token, next_token, line_distance):
             continue
+
         output += token.string
-        # no spaces before new line
+
         if _is_newline(next_token):
             continue
-        elif _is_itendation(next_token):
-            continue
-        elif (indent := _should_indent(token, next_token)):
+        if _is_newline(token):
+            if line_distance:
+                output += token.string * 2
+            spaces = False
+        if (indent := _get_indent(token, next_token)):
             output += indent
             continue
-        elif _is_itendation(token):
+        elif _is_indent(token):
             continue
-        elif _is_newline(token):
-            if next_token.type == tokenize.ENDMARKER:
-                break
-            if token.string != '\n': # fake newline, happens sometimes
-                continue
-            if line_distance:
-                output += token.string * 4
-        # code distance!
-        else:
+        elif spaces:
             output += '    '
     return output
 
+def _should_add_token(token, next_token, line_distance):
+    if token.type == tokenize.ENCODING:
+        return False
+    if line_distance and _is_newline(token) and _is_newline(next_token):
+        return False
+    return True
 
 def _is_newline(token: tokenize.TokenInfo) -> bool:
     return token.exact_type in (tokenize.NEWLINE, tokenize.NL)
 
-def _is_itendation(token):
+def _is_indent(token):
     return token.exact_type in (tokenize.INDENT, tokenize.DEDENT)
 
-def _should_indent(token, next_token):
+def _get_indent(token, next_token):
+    if _is_indent(next_token):
+        return ''
     if token.exact_type == tokenize.DEDENT:
         return ' ' * token.end[1]
     elif _is_newline(token):
