@@ -2,18 +2,22 @@
 import sys
 import tokenize
 from argparse import ArgumentParser
+from argparse import ArgumentDefaultsHelpFormatter
+import random
 from io import BytesIO
 
 
 class Reformatter:
-    def __init__(self):
+    def __init__(self, mean: int = 4, std: int = 1) -> None:
         self.indent_type = ""
+        self.mean = mean
+        self.std = std
 
     def reformat_string(self, contents: str, line_distance: bool = False) -> str:
         """Reormats string and adds social distancing spaces.
 
         :param contents: String to reformat.
-        :param line_distance: If True - adds 4 lines of space between every two
+        :param line_distance: If True - adds lines of space between every two
                               consecutive lines.
         :return: Formatted string.
 
@@ -41,7 +45,7 @@ class Reformatter:
                 continue
             if self._is_newline(token):
                 if line_distance:
-                    output += token.string * 2
+                    output += self._randup(token.string)
                 spaces = False
             if (indent := self._get_indent(token, next_token)) :
                 output += indent
@@ -51,8 +55,13 @@ class Reformatter:
                     self.indent_type = token.string[0]
                 continue
             elif spaces:
-                output += "    "
+                output += self._randup(" ")
         return output
+
+    def _randup(self, unit: str) -> str:
+        """Returns random (normally-distributed) number of copies of `unit`."""
+        n = max(int(random.gauss(self.mean, self.std)), 1)
+        return unit * n
 
     def _should_add_token(self, token, next_token, line_distance):
         if token.type == tokenize.ENCODING:
@@ -83,7 +92,7 @@ class Reformatter:
         Changes are done in-place.
 
         :param dst: Location of file to reformat.
-        :param line_distance: If True - adds 4 lines of space between every two
+        :param line_distance: If True - adds lines of space between every two
                               consecutive lines.
         :param dry_run: If True - does not write changes back.
 
@@ -113,10 +122,21 @@ class Reformatter:
 
 def main():
     parser = ArgumentParser(
-        description="The annoying (yet disease-free) code " "formatter."
+        description="The annoying (yet disease-free) code formatter.",
+        formatter_class=ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "-l", "--line", action="store_true", help="Include distancing between lines"
+    )
+    parser.add_argument(
+        "-m", "--mean", type=int, default=4, help="Mean number of spaces to add."
+    )
+    parser.add_argument(
+        "-s",
+        "--std",
+        type=int,
+        default=0,
+        help="Standard deviation of number of spaces to add.",
     )
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument(
@@ -135,7 +155,7 @@ def main():
 
     args = parser.parse_args()
 
-    reformatter = Reformatter()
+    reformatter = Reformatter(mean=args.mean, std=args.std)
     if args.code:
         output = reformatter.reformat_string(args.code, line_distance=args.line)
         print_stderr(output)

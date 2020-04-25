@@ -10,20 +10,25 @@ Just clone this project.
 
 ### Usage
 ```
-usage: codistancing.py [-h] [-l] [-c CODE] [-d] [FILE [FILE ...]]
+usage: codistancing.py [-h] [-l] [-m MEAN] [-s STD] [-c CODE] [-d]
+                       [FILE [FILE ...]]
 
 The annoying (yet disease-free) code formatter.
 
 positional arguments:
-  FILE                  Files to reformat (in place)
+  FILE                  Files to reformat (in place) (default: [])
 
 optional arguments:
   -h, --help            show this help message and exit
-  -l, --line            Include distancing between lines
-  -c CODE, --code CODE  Format the code passed in as a string.
+  -l, --line            Include distancing between lines (default: False)
+  -m MEAN, --mean MEAN  Mean number of spaces to add. (default: 4)
+  -s STD, --std STD     Standard deviation of number of spaces to add.
+                        (default: 0)
+  -c CODE, --code CODE  Format the code passed in as a string. (default: None)
   -d, --dry-run         Don't write the files back, just return the status.
                         Return code 0 means nothing would change. Return code
-                        1 means some files would be reformatted.
+                        1 means some files would be reformatted. (default:
+                        False)
 ```
 
 _Codistancing_ is a well-behaved Unix-style command-line tool:
@@ -63,7 +68,7 @@ one    ,    two    ,    three    ,    four    =    (    1    ,    2    ,    3   
 
 ### Empty lines
 If the `--line` argument is not passed, spacing between lines remains as it is.
-Otherwise, _Codistancing_ makes sure there are two blank lines between every two
+Otherwise, _Codistancing_ makes sure there are blank lines between every two
 content lines.
 ```python
 # in:
@@ -77,7 +82,7 @@ if    x    :
     pass
 
 ```
-The number remains two, even if it means deleting lines.
+The original number of blank lines is ignored.
 
 
 ### Tabs vs. spaces
