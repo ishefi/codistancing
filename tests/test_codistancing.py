@@ -1,3 +1,5 @@
+from pathlib import Path
+from tempfile import TemporaryDirectory, TemporaryFile
 from unittest import TestCase
 from codistancing import Reformatter
 
@@ -125,13 +127,41 @@ class CodistancingTestCase(TestCase):
     def test_tabs(self):
         self.assert_reformatting_from_data_file("tabs.py")
 
+    def test_reformat_file(self):
+        source, expected = self._read_test_data_file("fibonacci.py")
+        with TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            path = (workspace / "file.py").resolve()
+            with open(path, "w") as fh:
+                fh.write(source)
+            Reformatter().reformat_file(path, line_distance=True, dry_run=False)
+            with open(path, "r") as fh:
+                output = fh.read()
+        self.assertEqual(output, expected)
+
+    def test_reformat_file__dry_run(self):
+        source, expected = self._read_test_data_file("fibonacci.py")
+        with TemporaryDirectory() as tmpdir:
+            workspace = Path(tmpdir)
+            path = (workspace / "file.py").resolve()
+            with open(path, "w") as fh:
+                fh.write(source)
+            Reformatter().reformat_file(path, line_distance=True, dry_run=True)
+            with open(path, "r") as fh:
+                output = fh.read()
+        self.assertEqual(output, source)
+
+    def _read_test_data_file(self, test_file):
+        with open(f"data/{test_file}", "r") as f:
+            source, expected = f.read().split("# output\n")
+        return source, expected
+
     def assert_string_reformat(self, source, expected, line_distance=False):
         actual = Reformatter().reformat_string(source, line_distance)
         self.assertEqual(expected.replace(" ", "▀"), actual.replace(" ", "▀"))
 
     def assert_reformatting_from_data_file(self, test_file, line_distance=False):
-        with open(f"data/{test_file}", "r") as f:
-            source, expected = f.read().split("# output\n")
+        source, expected = self._read_test_data_file(test_file)
         self.assert_string_reformat(
             source=source, expected=expected, line_distance=line_distance
         )
