@@ -140,7 +140,7 @@ def main():
     )
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument(
-        "FILE", nargs="*", default=[], help="Files to reformat (in place)"
+        "files", metavar="FILE", nargs="*", default=[], help="Files to reformat (in place)"
     )
     source.add_argument("-c", "--code", help="Format the code passed in as a string.")
     parser.add_argument(
@@ -162,7 +162,7 @@ def main():
     else:
         status = [
             reformatter.reformat_file(f, line_distance=args.line, dry_run=args.dry_run)
-            for f in args.FILE
+            for f in args.files
         ]
         log = []
         reformatted = status.count(True)
