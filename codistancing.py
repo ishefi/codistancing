@@ -26,7 +26,7 @@ class Reformatter:
 
     def _reformat(self, contents, line_distance):
         all_tokens = list(tokenize.tokenize(contents.readline))
-        output = ''
+        output = ""
         for i, token in enumerate(all_tokens):
             next_token = all_tokens[i + 1]
             spaces = True
@@ -52,7 +52,7 @@ class Reformatter:
                     self.indent_type = token.string[0]
                 continue
             elif spaces:
-                output += '    '
+                output += "    "
         return output
 
     def _should_add_token(self, token, next_token, line_distance):
