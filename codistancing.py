@@ -124,7 +124,12 @@ def main():
     source.add_argument("-c", "--code",
                         help="Format the code passed in as a string.")
     parser.add_argument("-d", "--dry-run", action="store_true",
-                        help="Do nothing. Really nothing.")
+                        help="Don't write the files back, just return "
+                             "the status.  Return code 0 means nothing would "
+                             "change. Return code 1 means some files would be "
+                             "reformatted.")
+
+
     args = parser.parse_args()
 
     reformatter = Reformatter()
@@ -146,6 +151,9 @@ def main():
             log.append(f"{untouched} files {time_marker}left unchanged")
 
         print_stderr(f"{', '.join(log)}.")
+        if reformatted:
+            exit(1)
+    exit(0)
 
 
 def print_stderr(string):

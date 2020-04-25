@@ -12,21 +12,25 @@ Just clone this project.
 ```
 usage: codistancing.py [-h] [-l] [-c CODE] [-d] [FILE [FILE ...]]
 
+The annoying (yet disease free) code formatter.
+
 positional arguments:
-  FILE                 Files to reformat (in place)
+  FILE                  Files to reformat (in place)
 
 optional arguments:
   -h, --help            show this help message and exit
   -l, --line            Include distancing between lines
   -c CODE, --code CODE  Format the code passed in as a string.
-  -d, --dry-run         Do nothing. Really nothing.
+  -d, --dry-run         Don't write the files back, just return the status. 
+                        Return code 0 means nothing would change. Return code 1 
+                        means some files would be reformatted.
 ```
 
 _Codistancing_ is a well-behaved Unix-style command-line tool:
 
 - it does nothing if no sources are passed to it;
 - it only outputs messages to users on standard error;
-- exits with code 0 unless an internal error occurred;
+- exits with code 0 unless an internal error occurred (or `--dry-run` was used);
 - its README file is based on cutting edge formatters.
 
 ### Note: This is a stupid product
@@ -58,13 +62,14 @@ one    ,    two    ,    three    ,    four    =    (    1    ,    2    ,    3   
 ```
 
 ### Empty lines
-If the `-line` argument is not passed, spacing between lines remains as it is.
+If the `--line` argument is not passed, spacing between lines remains as it is.
 Otherwise, _Codistancing_ makes sure there are two blank lines between every two
 content lines.
 ```python
 # in:
 if x:
     pass
+
 # out:
 if    x    :
 
@@ -73,6 +78,11 @@ if    x    :
 
 ```
 The number remains two, even if it means deleting lines.
+
+
+### Tabs vs. spaces
+_Codistancing_ does not care whether you use tabs or spaces. Using tabs is your
+own damn problem and _Codistancing_ cannot help you with that.
 
 
 ## Integrations
