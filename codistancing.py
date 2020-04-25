@@ -9,7 +9,7 @@ class Reformatter:
     def __init__(self):
         self.indent_type = ""
 
-    def reformat_string(self, contents: str, line_distance: bool=False) -> str:
+    def reformat_string(self, contents: str, line_distance: bool = False) -> str:
         """Reormats string and adds social distancing spaces.
 
         :param contents: String to reformat.
@@ -22,7 +22,6 @@ class Reformatter:
             print    (    "hello!"    )
         """
         return self._reformat(BytesIO(contents.encode()), line_distance)
-
 
     def _reformat(self, contents, line_distance):
         all_tokens = list(tokenize.tokenize(contents.readline))
@@ -44,7 +43,7 @@ class Reformatter:
                 if line_distance:
                     output += token.string * 2
                 spaces = False
-            if (indent := self._get_indent(token, next_token)):
+            if (indent := self._get_indent(token, next_token)) :
                 output += indent
                 continue
             elif self._is_indent(token):
@@ -68,7 +67,9 @@ class Reformatter:
     def _is_indent(self, token: tokenize.TokenInfo) -> bool:
         return token.exact_type in (tokenize.INDENT, tokenize.DEDENT)
 
-    def _get_indent(self, token: tokenize.TokenInfo, next_token: tokenize.TokenInfo) -> str:
+    def _get_indent(
+        self, token: tokenize.TokenInfo, next_token: tokenize.TokenInfo
+    ) -> str:
         if self._is_indent(next_token):
             return ""
         if token.exact_type == tokenize.DEDENT:
@@ -76,8 +77,6 @@ class Reformatter:
         elif self._is_newline(token):
             return self.indent_type * next_token.start[1]
         return ""
-
-
 
     def reformat_file(self, dst: str, line_distance: bool, dry_run: bool) -> bool:
         """Reformats file by adding social-distancing spaces.
@@ -100,7 +99,6 @@ class Reformatter:
 
         change = output != source
 
-
         if change:
             if dry_run:
                 print_stderr(f"would reformat {dst}")
@@ -114,21 +112,26 @@ class Reformatter:
 
 
 def main():
-    parser = ArgumentParser(description="The annoying (yet disease free) code "
-                                        "formatter.")
-    parser.add_argument("-l", "--line", action="store_true",
-                        help="Include distancing between lines")
+    parser = ArgumentParser(
+        description="The annoying (yet disease-free) code " "formatter."
+    )
+    parser.add_argument(
+        "-l", "--line", action="store_true", help="Include distancing between lines"
+    )
     source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("FILE", nargs="*", default=[],
-                        help="Files to reformat (in place)")
-    source.add_argument("-c", "--code",
-                        help="Format the code passed in as a string.")
-    parser.add_argument("-d", "--dry-run", action="store_true",
-                        help="Don't write the files back, just return "
-                             "the status.  Return code 0 means nothing would "
-                             "change. Return code 1 means some files would be "
-                             "reformatted.")
-
+    source.add_argument(
+        "FILE", nargs="*", default=[], help="Files to reformat (in place)"
+    )
+    source.add_argument("-c", "--code", help="Format the code passed in as a string.")
+    parser.add_argument(
+        "-d",
+        "--dry-run",
+        action="store_true",
+        help="Don't write the files back, just return "
+        "the status.  Return code 0 means nothing would "
+        "change. Return code 1 means some files would be "
+        "reformatted.",
+    )
 
     args = parser.parse_args()
 

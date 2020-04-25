@@ -1,7 +1,7 @@
-_Codistancing_ is a Python code formatter that makes sure tokens in your code
-do not infect each other. By using it, you agree to cede control over the looks 
-of your code. In return, _Codistancing_ gives you determinism and extremely 
-unreadable code - but at least it is disease free.
+_Codistancing_ is a Python 3.8+ code formatter that makes sure tokens in your
+code do not infect each other. By using it, you agree to cede control over the
+looks of your code. In return, _Codistancing_ gives you determinism and
+extremely unreadable code - but at least it is disease free.
 
 ## Installation and Usage
 
@@ -12,7 +12,7 @@ Just clone this project.
 ```
 usage: codistancing.py [-h] [-l] [-c CODE] [-d] [FILE [FILE ...]]
 
-The annoying (yet disease free) code formatter.
+The annoying (yet disease-free) code formatter.
 
 positional arguments:
   FILE                  Files to reformat (in place)
@@ -21,9 +21,9 @@ optional arguments:
   -h, --help            show this help message and exit
   -l, --line            Include distancing between lines
   -c CODE, --code CODE  Format the code passed in as a string.
-  -d, --dry-run         Don't write the files back, just return the status. 
-                        Return code 0 means nothing would change. Return code 1 
-                        means some files would be reformatted.
+  -d, --dry-run         Don't write the files back, just return the status.
+                        Return code 0 means nothing would change. Return code
+                        1 means some files would be reformatted.
 ```
 
 _Codistancing_ is a well-behaved Unix-style command-line tool:
