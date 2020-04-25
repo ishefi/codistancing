@@ -20,7 +20,10 @@ def reformat_string(contents: str, line_distance: bool=False) -> str:
     return _reformat(BytesIO(contents.encode()), line_distance)
 
 
+indent_type = None
 def _reformat(contents, line_distance):
+    global indent_type
+    indent_type = ''
     all_tokens = list(tokenize.tokenize(contents.readline))
     output = ''
     for i, token in enumerate(all_tokens):
@@ -44,6 +47,8 @@ def _reformat(contents, line_distance):
             output += indent
             continue
         elif _is_indent(token):
+            if not indent_type:
+                indent_type = token.string[0]
             continue
         elif spaces:
             output += '    '
@@ -66,9 +71,9 @@ def _get_indent(token, next_token):
     if _is_indent(next_token):
         return ""
     if token.exact_type == tokenize.DEDENT:
-        return " " * token.end[1]
+        return indent_type * token.end[1]
     elif _is_newline(token):
-        return " " * next_token.start[1]
+        return indent_type * next_token.start[1]
     return ""
 
 
