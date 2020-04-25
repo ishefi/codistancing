@@ -73,7 +73,7 @@ def _get_indent(token, next_token):
 
 
 
-def reformat_file(dst: str, line_distance: bool, dry_run: bool) -> None:
+def reformat_file(dst: str, line_distance: bool, dry_run: bool) -> bool:
     """Reformats file by adding social-distancing spaces.
     Changes are done in-place.
 
@@ -81,13 +81,30 @@ def reformat_file(dst: str, line_distance: bool, dry_run: bool) -> None:
     :param line_distance: If True - adds 4 lines of space between every two
                           consecutive lines.
     :param dry_run: If True - does not write changes back.
+
+    :return: True if there is diff between source and reformatted file, False
+             otherwise.
+
     """
     with open(dst, "rb") as f:
         output = _reformat(f, line_distance)
 
-    if not dry_run:
-        with open(dst, "w") as f:
-            f.write(output)
+    with open(dst, "r") as f:
+        source = f.read()
+
+    change = output != source
+
+
+    if change:
+        if dry_run:
+            print_stderr(f"would reformat {dst}")
+        else:
+            with open(dst, "w") as f:
+                f.write(output)
+            print_stderr(f"reformatted {dst}")
+        return True
+    else:
+        return False
 
 
 def main():
@@ -105,13 +122,27 @@ def main():
     args = parser.parse_args()
 
     if args.code:
-        output = reformat_string(args.string, line_distance=args.line)
-        print(output, file=sys.stderr)
+        output = reformat_string(args.code, line_distance=args.line)
+        print_stderr(output)
     else:
-        for f in args.FILE:
-            print(f"Formatting {f}...", file=sys.stderr)
+        status = [
             reformat_file(f, line_distance=args.line, dry_run=args.dry_run)
-        print("Done!", file=sys.stderr)
+            for f in args.FILE
+        ]
+        log = []
+        reformatted = status.count(True)
+        time_marker = "would be " if args.dry_run else ""
+        if reformatted:
+            log.append(f"{reformatted} files {time_marker}reformatted")
+        untouched = status.count(False)
+        if untouched:
+            log.append(f"{untouched} files {time_marker}left unchanged")
+
+        print_stderr(f"{', '.join(log)}.")
+
+
+def print_stderr(string):
+    print(string, file=sys.stderr)
 
 
 if __name__ == "__main__":
