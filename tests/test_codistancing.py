@@ -1,5 +1,5 @@
 from unittest import TestCase
-from codistancing import reformat_string
+from codistancing import Reformatter
 
 
 class CodistancingTestCase(TestCase):
@@ -126,7 +126,7 @@ class CodistancingTestCase(TestCase):
         self.assert_reformatting_from_data_file("tabs.py")
 
     def assert_string_reformat(self, source, expected, line_distance=False):
-        actual = reformat_string(source, line_distance)
+        actual = Reformatter().reformat_string(source, line_distance)
         self.assertEqual(expected.replace(" ", "▀"), actual.replace(" ", "▀"))
 
     def assert_reformatting_from_data_file(self, test_file, line_distance=False):
