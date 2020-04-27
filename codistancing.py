@@ -60,7 +60,7 @@ class Reformatter:
 
     def _randup(self, unit: str) -> str:
         """Returns random (normally-distributed) number of copies of `unit`."""
-        n = max(int(random.gauss(self.mean, self.std)), 1)
+        n = max(round(random.gauss(self.mean, self.std)), 1)
         return unit * n
 
     def _should_add_token(self, token, next_token, line_distance):
