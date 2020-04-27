@@ -45,7 +45,7 @@ class Reformatter:
                 continue
             if self._is_newline(token):
                 if line_distance:
-                    output += self._randup(token.string)
+                    output += token.string * 2
                 spaces = False
             if (indent := self._get_indent(token, next_token)) :
                 output += indent
