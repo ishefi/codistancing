@@ -8,7 +8,7 @@ from io import BytesIO
 
 
 class Reformatter:
-    def __init__(self, mean: int = 4, std: int = 1) -> None:
+    def __init__(self, mean: int = 4, std: int = 0) -> None:
         self.indent_type = ""
         self.mean = mean
         self.std = std
