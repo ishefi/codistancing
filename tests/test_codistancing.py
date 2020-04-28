@@ -131,16 +131,19 @@ class CodistancingTestCase(TestCase):
         self.assertEqual(output, source)
 
     def test_data_science(self):
-        reformatter = Reformatter(mean=4, std=1)
-        actual = reformatter.reformat_string(
-            "for i in range(5): "
-            "for j in range(9): "
-            "for k in range(3): "
-            "print(i*j+k)"
-        )
-        blanks = re.split(r"\S+", actual)
-        lens = [len(b) for b in blanks if b]
-        self.assertEqual(statistics.median(lens), 4)
+        reformatter = Reformatter(mean=4, std=0.5)
+        lens = []
+        for _ in range(100):
+            actual = reformatter.reformat_string(
+                "for i in range(9): "
+                "for j in range(1): "
+                "for k in range(2): "
+                "for l in range(1): "
+                "print(i*j+k)"
+            )
+            blanks = re.split(r"\S+", actual)
+            lens.extend(len(b) for b in blanks if b)
+        self.assertEqual(round(statistics.mean(lens)), 4)
         self.assertNotEqual(set(lens), {4})
 
     def _read_test_data_file(self, test_file):
